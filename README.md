@@ -1,1 +1,3 @@
 # leetcode
+note
+note2
