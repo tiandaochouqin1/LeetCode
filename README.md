@@ -1,4 +1,2 @@
 # leetcode
-note
-note2
-note3
+我的记录
