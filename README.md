@@ -1,3 +1,3 @@
-# leetcode练习记录
+# Leetcode Solutions
 
 
