@@ -1,0 +1,230 @@
+#include<iostream>
+using namespace std;
+
+const int kong = 0;
+const int black = 1;
+const int white = -1;
+const int board_length = 8;
+const int board_full = 64;
+const int dir_x[8] = {-1,-1,0,1,1,1,0,-1};
+const int dir_y[8] = {0,1,1,1,0,-1,-1,-1};
+
+class Heibaiqi {
+private:
+	int Board[board_length][board_length];
+public:
+	Heibaiqi();
+	void addBlack();
+	void addWhite();
+	bool canPut(const int color,  const int x, const int y);
+	bool canGo(const int color);
+	bool inBoard(const int x, const int y);
+	int counter();
+	void put(const int color, const int x, const int y);
+	void panduan();
+	void show();
+	void Start();
+
+};
+//主函数
+int main()
+{
+	Heibaiqi hbq;
+	hbq.Start();
+	system("pause");
+	return 0;
+}
+
+//构造函数
+Heibaiqi::Heibaiqi()
+{
+	memset(Board, 0, sizeof(Board));
+	Board[3][3] = white;
+	Board[4][4] = white;
+	Board[3][4] = black;
+	Board[4][3] = black;
+}
+
+//输出棋盘
+void Heibaiqi::show()
+{
+	system("CLS");
+	cout << "  0 1 2 3 4 5 6 7" << endl;
+	for (int i = 0;i < board_length;i++)
+	{
+		cout << i << " ";
+		for (int j = 0;j < board_length;j++)
+		{
+			if (Board[i][j] == kong)
+				cout << "  ";
+			if (Board[i][j] == black)
+				cout << "* ";
+			if (Board[i][j] == white)
+				cout << "O ";
+		}
+		cout << endl;
+	}
+}
+
+//计算棋盘内棋子个数
+int Heibaiqi::counter()
+{
+	int count = 0;
+	for (int i = 0;i < board_length;i++)
+	{
+		for (int j = 0;j < board_length;j++)
+		{
+			if (Board[i][j] != 0)
+				count++;
+		}
+	}
+	return count;
+}
+
+//走棋
+void Heibaiqi::put(const int color, const int x, const int y)
+{
+	int x2, y2;
+	Board[x][y] = color;
+	for (int i = 0;i < 8;i++)
+	{
+		x2 = x;
+		y2 = y;
+
+		if (inBoard(x2 + dir_x[i], y2 + dir_y[i]) && Board[x2 + dir_x[i]][y2 + dir_y[i]] == -color)
+		{
+			do {
+				x2 += dir_x[i];
+				y2 += dir_y[i];
+			} while (inBoard(x2 + dir_x[i], y2 + dir_y[i]) && Board[x2 + dir_x[i]][y2 + dir_y[i]] == -color);
+			if (inBoard(x2 + dir_x[i], y2 + dir_y[i]) && Board[x2 + dir_x[i]][y2 + dir_y[i]] == color)
+			{
+				do {
+					Board[x2][y2] = color;
+					x2 -= dir_x[i];
+					y2 -= dir_y[i];
+				} while (Board[x2][y2] != color);
+			}
+		}
+	}
+}
+
+//判断是否在棋盘内
+bool Heibaiqi::inBoard(const int x, const int y)
+{
+	if ((x >= 0 && x < board_length) && (y >= 0 && y < board_length))
+		return true;
+	return false;
+}
+
+//判断该位置是否能走
+bool Heibaiqi::canPut(const int color, const int x, const int y)
+{
+	int x2, y2;
+	if (!inBoard(x,y))
+		return false;
+	if (Board[x][y] != 0)//判断该处是否有棋子
+		return false;
+	for (int i = 0;i < 8;i++)
+	{
+		x2 = x;
+		y2 = y;
+
+		if (inBoard(x2 + dir_x[i], y2 + dir_y[i]) && Board[x2 + dir_x[i]][y2 + dir_y[i]] == -color)
+		{
+			do {
+				x2 += dir_x[i];
+				y2 += dir_y[i];
+			} while (inBoard(x2 + dir_x[i], y2 + dir_y[i]) && Board[x2 + dir_x[i]][y2 + dir_y[i]] == -color);
+			if (inBoard(x2 + dir_x[i], y2 + dir_y[i]) && Board[x2 + dir_x[i]][y2 + dir_y[i]] == color)
+				return true;
+		}
+	}
+	return false;
+}
+
+//判断该颜色是否能走
+bool Heibaiqi::canGo(const int color)
+{
+	for (int i = 0;i < board_length;i++)
+	{
+		for (int j = 0;j < board_length;j++)
+		{
+			if (canPut(color, i, j))
+				return true;
+		}
+	}
+	return false;
+}
+
+//走黑棋
+void Heibaiqi::addBlack()
+{
+	int x, y;
+	cout << "请输入黑棋坐标x y(横为y,竖为x)" << endl;
+	cin >> x >> y;
+	while (!canPut(black, x, y))
+	{
+		cout << "不能下在该处" << endl;
+		cout << "请输入黑棋坐标x y(横为y,竖为x)" << endl;
+		cin >> x >> y;
+	}
+	put(black, x, y);
+}
+
+//走白棋
+void Heibaiqi::addWhite()
+{
+	int x, y;
+	cout << "请输入白棋坐标x y(横为y,竖为x)" << endl;
+	cin >> x >> y;
+	while (!canPut(white, x, y))
+	{
+		cout << "不能下在该处" << endl;
+		cout << "请输入白棋坐标x y(横为y,竖为x)" << endl;
+		cin >> x >> y;
+	}
+	put(white, x, y);
+}
+
+//黑白棋运行
+void Heibaiqi::Start()
+{
+	show();
+	while (counter() != board_full)
+	{
+		if (canGo(black))
+		{
+			addBlack();
+			show();
+		}
+		if (canGo(white))
+		{
+			addWhite();
+			show();
+		}
+	}
+	panduan();
+}
+
+//判断输赢
+void Heibaiqi::panduan()
+{
+	int countb = 0, countw = 0;
+	for (int i = 0;i < board_length;i++)
+	{
+		for (int j = 0;j < board_length;j++)
+		{
+			if (Board[i][j] == black)
+				countb++;
+			if (Board[i][j] == white)
+				countw++;
+		}
+	}
+	if (countb > countw)
+		cout << "黑胜" << endl;
+	else if (countb < countw)
+		cout << "白胜" << endl;
+	else
+		cout << "平局" << endl;
+}
